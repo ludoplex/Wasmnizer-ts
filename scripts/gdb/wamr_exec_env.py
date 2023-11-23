@@ -80,10 +80,7 @@ class WASMInterpFrame:
 
     def get_prev_frame(self):
         ref = self.interp_frame['prev_frame']
-        if (ref != 0):
-            return WASMInterpFrame(ref)
-
-        return None
+        return WASMInterpFrame(ref) if (ref != 0) else None
 
     def _get_operand_stack(self):
         return self.interp_frame['lp']

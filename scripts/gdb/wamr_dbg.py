@@ -21,13 +21,11 @@ from wamr_exec_env import *
 
 def _get_ref(arg):
     if (type(arg) == int):
-        ref = gdb.Value(arg)
+        return gdb.Value(arg)
     elif (type(arg) == str):
-        ref = gdb.parse_and_eval(arg)
+        return gdb.parse_and_eval(arg)
     else:
-        ref = arg
-
-    return ref
+        return arg
 
 def wamr_get_type(arg):
     ref = _get_ref(arg)
@@ -35,9 +33,7 @@ def wamr_get_type(arg):
     return WASMType.create_type(ref)
 
 def wamr_type_dump(arg):
-    wasm_type = wamr_get_type(arg)
-
-    if (wasm_type):
+    if wasm_type := wamr_get_type(arg):
         print(wasm_type)
 
 
@@ -47,9 +43,7 @@ def wamr_get_gc_obj(arg):
     return WASMObj.create_obj(ref)
 
 def wamr_gc_obj_dump(arg):
-    wasm_obj = wamr_get_gc_obj(arg)
-
-    if (wasm_obj):
+    if wasm_obj := wamr_get_gc_obj(arg):
         print(wasm_obj)
 
 def wamr_get_exec_env(arg):
@@ -58,9 +52,7 @@ def wamr_get_exec_env(arg):
     return WASMExecEnv(ref)
 
 def wamr_exec_env_dump(arg):
-    wasm_exec = wamr_get_exec_env(arg)
-
-    if (wasm_exec):
+    if wasm_exec := wamr_get_exec_env(arg):
         print(wasm_exec)
 
 def wamr_get_interp_frame(arg):
@@ -69,9 +61,7 @@ def wamr_get_interp_frame(arg):
     return WASMInterpFrame(ref)
 
 def wamr_interp_frame_dump(arg):
-    wasm_frame = wamr_get_interp_frame(arg)
-
-    if (wasm_frame):
+    if wasm_frame := wamr_get_interp_frame(arg):
         print(wasm_frame)
 
 def wamr_interp_frame_dump_all(arg):
@@ -82,9 +72,7 @@ def wamr_interp_frame_dump_all(arg):
         wasm_frame = wasm_frame.get_prev_frame()
 
 def wamr_exec_env_dump_all_interp_frame(arg):
-    exec_env = wamr_get_exec_env(arg)
-
-    if (exec_env):
+    if exec_env := wamr_get_exec_env(arg):
         cur_frame = exec_env.get_cur_frame()
         while (cur_frame):
             print(cur_frame)
@@ -143,9 +131,7 @@ def wamr_get_function(arg):
     return WASMFunction(ref)
 
 def wamr_function_dump(arg):
-    wasm_frame = wamr_get_function(arg)
-
-    if (wasm_frame):
+    if wasm_frame := wamr_get_function(arg):
         print(wasm_frame)
 
 # register commands
