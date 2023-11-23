@@ -63,15 +63,17 @@ class WASMStructType(WASMType):
                 'offset': int(field_type['field_offset']),
             }
             # for ref ht type, get its ref type
-            if field_info['type'] == 'REF_TYPE_HT_NON_NULLABLE' \
-                or field_info['type'] == 'REF_TYPE_HT_NULLABLE':
+            if field_info['type'] in [
+                'REF_TYPE_HT_NON_NULLABLE',
+                'REF_TYPE_HT_NULLABLE',
+            ]:
                 ref_type_map = self.type['ref_type_maps']
                 ret_type_count = int(self.type['ref_type_map_count'])
                 for j in range(ret_type_count):
                     ref_type = ref_type_map[j]
                     if (ref_type['index'] == i):
                         field_info['type'] += \
-                            f" (typeid={int(ref_type['ref_type']['ref_ht_typeidx']['type_idx'])})"
+                                f" (typeid={int(ref_type['ref_type']['ref_ht_typeidx']['type_idx'])})"
 
             fields_info.append(field_info)
         return fields_info
@@ -79,14 +81,11 @@ class WASMStructType(WASMType):
     def _create_fields_description(self):
         fields_info = self._get_fields_info()
         description = ''
-        index = 0
-        for field in fields_info:
+        for index, field in enumerate(fields_info):
             description += f'    #[{index}]  type:\t{field["type"]}\n'
             description += f'\t  mut:\t{"true" if field["flag"] & 1 else "false"}\n'
             description += f'\t  offset:\t{field["offset"]}\n'
             description += f'\t  size:\t{field["size"]}\n'
-            index += 1
-
         return description
 
     def __str__(self):
@@ -123,8 +122,7 @@ class WASMFuncType(WASMType):
         for i in range(self.param_count):
             type = WASM_TYPE_MAP[int(self.type["types"][i])]
             # for ref ht type, get its ref type
-            if type == 'REF_TYPE_HT_NON_NULLABLE' \
-                or type == 'REF_TYPE_HT_NULLABLE':
+            if type in ['REF_TYPE_HT_NON_NULLABLE', 'REF_TYPE_HT_NULLABLE']:
                 type += f' (typeid={self._get_reftype_id(i)})'
             types.append(type)
 
@@ -136,8 +134,7 @@ class WASMFuncType(WASMType):
         for i in range(self.param_count, self.param_count + self.result_count):
             type = WASM_TYPE_MAP[int(self.type["types"][i])]
             # for ref ht type, get its ref type
-            if type == 'REF_TYPE_HT_NON_NULLABLE' \
-                or type == 'REF_TYPE_HT_NULLABLE':
+            if type in ['REF_TYPE_HT_NON_NULLABLE', 'REF_TYPE_HT_NULLABLE']:
                 type += f' (typeid={self._get_reftype_id(i)})'
             types.append(type)
 
@@ -146,13 +143,7 @@ class WASMFuncType(WASMType):
     def _get_description(self, results = False):
         types = self._get_result_types() if results else self._get_parameter_types()
 
-        description = ''
-        index = 0
-        for type in types:
-            description += f'    #[{index}]\t{type}\n'
-            index += 1
-
-        return description
+        return ''.join(f'    #[{index}]\t{type}\n' for index, type in enumerate(types))
 
     def __str__(self):
         return f'{GREEN}WASMFuncType: {hex(self.ref)}\n' + \

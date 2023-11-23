@@ -59,27 +59,26 @@ class WASMObj:
     def create_obj(obj_ref):
         if (get_bit(int(obj_ref))):
             return WASMI31Obj(int(obj_ref) >> 1)
-        else:
-            try:
-                hmu = HMU(obj_to_hmu(obj_ref))
-                rtt = WASMRtt(obj_get_rtt_ref(obj_ref))
+        try:
+            hmu = HMU(obj_to_hmu(obj_ref))
+            rtt = WASMRtt(obj_get_rtt_ref(obj_ref))
 
-                type_flag = rtt.type_flag
-                if type_flag == 'WASM_TYPE_ARRAY':
-                    return WASMArrayObj(obj_ref, hmu, rtt)
-                elif type_flag == 'WASM_TYPE_STRUCT':
-                    return WASMStructObj(obj_ref, hmu, rtt)
-                elif type_flag == 'WASM_TYPE_FUNC':
-                    return WASMFuncObj(obj_ref, hmu, rtt)
-                elif type_flag == 'WASM_TYPE_EXTERNREF':
-                    return WASMExternRefObj(obj_ref, hmu, rtt)
-                elif type_flag == 'WASM_TYPE_ANYREF':
-                    return WASMAnyRefObj(obj_ref, hmu, rtt)
-                else:
-                    return None
-            except gdb.MemoryError as e:
-                print(f'{RED}Not a WasmGC object{ENDC}')
+            type_flag = rtt.type_flag
+            if type_flag == 'WASM_TYPE_ANYREF':
+                return WASMAnyRefObj(obj_ref, hmu, rtt)
+            elif type_flag == 'WASM_TYPE_ARRAY':
+                return WASMArrayObj(obj_ref, hmu, rtt)
+            elif type_flag == 'WASM_TYPE_EXTERNREF':
+                return WASMExternRefObj(obj_ref, hmu, rtt)
+            elif type_flag == 'WASM_TYPE_FUNC':
+                return WASMFuncObj(obj_ref, hmu, rtt)
+            elif type_flag == 'WASM_TYPE_STRUCT':
+                return WASMStructObj(obj_ref, hmu, rtt)
+            else:
                 return None
+        except gdb.MemoryError as e:
+            print(f'{RED}Not a WasmGC object{ENDC}')
+            return None
 
 class WASMI31Obj:
     def __init__(self, value):
